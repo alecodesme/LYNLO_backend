@@ -14,6 +14,9 @@ import { CreateClientRequestDto } from './dto/create-client-request.dto';
 import { UpdateClientRequestDto } from './dto/update-client-request.dto';
 import { ClientResponseDto } from './dto/client-response.dto';
 import { Client } from './entities/client.entity';
+import { ClientsService } from './client.service';
+import { CurrentUser } from '../../common/decorators/current-user.decorator';
+import * as authenticatedUserInterface from '../../common/interfaces/authenticated-user.interface';
 
 @Controller('clients')
 export class ClientsController {
@@ -22,7 +25,7 @@ export class ClientsController {
   @Post()
   @HttpCode(HttpStatus.CREATED)
   async create(
-    @CurrentUser() user: AuthenticatedUser,
+    @CurrentUser() user: authenticatedUserInterface.AuthenticatedUser,
     @Body() dto: CreateClientRequestDto,
   ): Promise<ClientResponseDto> {
     const client = await this.clientsService.create(user.id, dto);
@@ -31,7 +34,7 @@ export class ClientsController {
 
   @Get()
   async findAll(
-    @CurrentUser() user: AuthenticatedUser,
+    @CurrentUser() user: authenticatedUserInterface.AuthenticatedUser,
   ): Promise<ClientResponseDto[]> {
     const clients = await this.clientsService.findAllByOwner(user.id);
     return clients.map((client) => this.toResponseDto(client));
@@ -40,7 +43,7 @@ export class ClientsController {
   @Get(':id')
   async findOne(
     @Param('id', ParseUUIDPipe) id: string,
-    @CurrentUser() user: AuthenticatedUser,
+    @CurrentUser() user: authenticatedUserInterface.AuthenticatedUser,
   ): Promise<ClientResponseDto> {
     const client = await this.clientsService.findOneByOwner(id, user.id);
     return this.toResponseDto(client);
@@ -49,7 +52,7 @@ export class ClientsController {
   @Patch(':id')
   async update(
     @Param('id', ParseUUIDPipe) id: string,
-    @CurrentUser() user: AuthenticatedUser,
+    @CurrentUser() user: authenticatedUserInterface.AuthenticatedUser,
     @Body() dto: UpdateClientRequestDto,
   ): Promise<ClientResponseDto> {
     const client = await this.clientsService.update(id, user.id, dto);
@@ -60,7 +63,7 @@ export class ClientsController {
   @HttpCode(HttpStatus.NO_CONTENT)
   async remove(
     @Param('id', ParseUUIDPipe) id: string,
-    @CurrentUser() user: AuthenticatedUser,
+    @CurrentUser() user: authenticatedUserInterface.AuthenticatedUser,
   ): Promise<void> {
     await this.clientsService.remove(id, user.id);
   }
