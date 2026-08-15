@@ -10,11 +10,6 @@ export class ClientCategoriesService {
     private readonly clientCategoriesRepository: Repository<ClientCategory>,
   ) {}
 
-  /**
-   * Devuelve todas las categorias de cliente disponibles, ordenadas
-   * alfabeticamente. Lo usa el frontend para poblar un selector/dropdown
-   * al crear o editar un cliente.
-   */
   async findAll(): Promise<ClientCategory[]> {
     return this.clientCategoriesRepository.find({
       order: { name: 'ASC' },

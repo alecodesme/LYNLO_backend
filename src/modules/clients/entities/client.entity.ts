@@ -14,43 +14,48 @@ import { ClientPhone } from './client-phone.entity';
 
 @Entity('clients')
 export class Client {
-  @PrimaryGeneratedColumn('uuid')
-  id!: string;
 
-  @Column({ type: 'uuid', name: 'user_id' })
-  userId!: string;
+    // Db fields
 
-  @ManyToOne(() => User, { onDelete: 'CASCADE' })
-  @JoinColumn({ name: 'user_id' })
-  user!: User;
+    @PrimaryGeneratedColumn('uuid')
+    id!: string;
 
-  @Column({ type: 'uuid', name: 'category_id' })
-  categoryId!: string;
+    @Column({ type: 'varchar', length: 200 })
+    name!: string;
 
-  @ManyToOne(() => ClientCategory)
-  @JoinColumn({ name: 'category_id' })
-  category!: ClientCategory;
+    @Column({ type: 'varchar', length: 150, name: 'reference_name', nullable: true })
+    referenceName!: string | null;
 
-  @Column({ type: 'varchar', length: 200 })
-  name!: string;
+    @Column({ type: 'varchar', length: 250, nullable: true })
+    address!: string | null;
 
-  @Column({ type: 'varchar', length: 150, name: 'reference_name', nullable: true })
-  referenceName!: string | null;
+    @Column({ type: 'varchar', length: 150, nullable: true })
+    email!: string | null;
 
-  @Column({ type: 'varchar', length: 250, nullable: true })
-  address!: string | null;
+    // Relations
+    @Column({ type: 'uuid', name: 'user_id' })
+    userId!: string;
 
-  @Column({ type: 'varchar', length: 150, nullable: true })
-  email!: string | null;
+    @ManyToOne(() => User, { onDelete: 'CASCADE' })
+    @JoinColumn({ name: 'user_id' })
+    user!: User;
 
-  @OneToMany(() => ClientPhone, (phone) => phone.client, {
-    cascade: true, // permite guardar los phones al guardar el client
-  })
-  phones!: ClientPhone[];
+    @Column({ type: 'uuid', name: 'category_id' })
+    categoryId!: string;
 
-  @CreateDateColumn({ type: 'timestamp', name: 'created_at' })
-  createdAt!: Date;
+    @ManyToOne(() => ClientCategory)
+    @JoinColumn({ name: 'category_id' })
+    category!: ClientCategory;
 
-  @UpdateDateColumn({ type: 'timestamp', name: 'updated_at' })
-  updatedAt!: Date;
+    @OneToMany(() => ClientPhone, (phone) => phone.client, {
+        cascade: true, 
+    })
+    phones!: ClientPhone[]
+
+    // timestamps
+    @CreateDateColumn({ type: 'timestamp', name: 'created_at' })
+    createdAt!: Date;
+
+    @UpdateDateColumn({ type: 'timestamp', name: 'updated_at' })
+    updatedAt!: Date;
 }
