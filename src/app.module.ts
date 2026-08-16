@@ -10,6 +10,7 @@ import { JwtAuthGuard } from './common/guards/jwt-auth.guard';
 import { UsersModule } from './modules/users/users.module';
 import { AuthModule } from './modules/auth/auth.module';
 import { ClientCategoriesModule } from './modules/client-categories/client-categories.module';
+import { ClientsModule } from './modules/clients/client.module';
 
 @Module({
   imports: [
@@ -27,6 +28,7 @@ import { ClientCategoriesModule } from './modules/client-categories/client-categ
     UsersModule,
     AuthModule,
     ClientCategoriesModule,
+    ClientsModule
   ],
   providers: [
     {

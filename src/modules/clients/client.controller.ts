@@ -49,15 +49,15 @@ export class ClientsController {
     return this.toResponseDto(client);
   }
 
-  @Patch(':id')
-  async update(
-    @Param('id', ParseUUIDPipe) id: string,
-    @CurrentUser() user: authenticatedUserInterface.AuthenticatedUser,
-    @Body() dto: UpdateClientRequestDto,
-  ): Promise<ClientResponseDto> {
-    const client = await this.clientsService.update(id, user.id, dto);
-    return this.toResponseDto(client);
-  }
+    @Patch(':id')
+    async update(
+      @Param('id', ParseUUIDPipe) id: string,
+      @CurrentUser() user: authenticatedUserInterface.AuthenticatedUser,
+      @Body() dto: UpdateClientRequestDto,
+    ): Promise<ClientResponseDto> {
+      const client = await this.clientsService.update(id, user.id, dto);
+      return this.toResponseDto(client);
+    }
 
   @Delete(':id')
   @HttpCode(HttpStatus.NO_CONTENT)

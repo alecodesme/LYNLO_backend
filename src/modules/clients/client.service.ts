@@ -5,12 +5,15 @@ import { Client } from './entities/client.entity';
 import { ClientPhone } from './entities/client-phone.entity';
 import { CreateClientRequestDto } from './dto/create-client-request.dto';
 import { UpdateClientRequestDto } from './dto/update-client-request.dto';
+import { ClientPhoneRequestDto } from './dto/client-phone-request.dto';
 
 @Injectable()
 export class ClientsService {
   constructor(
     @InjectRepository(Client)
     private readonly clientsRepository: Repository<Client>,
+    @InjectRepository(ClientPhone)
+    private readonly clientPhonesRepository: Repository<ClientPhone>,
   ) {}
 
   async create(ownerId: string, dto: CreateClientRequestDto): Promise<Client> {
@@ -59,27 +62,47 @@ export class ClientsService {
     ownerId: string,
     dto: UpdateClientRequestDto,
   ): Promise<Client> {
-    const client = await this.findOneByOwner(id, ownerId);
+    // Confirma existencia y pertenencia antes de tocar nada.
+    await this.findOneByOwner(id, ownerId);
 
-    Object.assign(client, {
-      categoryId: dto.categoryId ?? client.categoryId,
-      name: dto.name ?? client.name,
-      referenceName: dto.referenceName ?? client.referenceName,
-      address: dto.address ?? client.address,
-      email: dto.email ?? client.email,
-    });
+    console.log('DTO recibido en update:', dto);
+
+    const updateResult = await this.clientsRepository.update(
+      { id, userId: ownerId },
+      {
+        categoryId: dto.categoryId,
+        name: dto.name,
+        referenceName: dto.referenceName,
+        address: dto.address,
+        email: dto.email,
+      },
+    );
+
+    console.log('Filas afectadas por el update:', updateResult.affected);
 
     if (dto.phones) {
-      client.phones = dto.phones.map((phone) => {
-        const clientPhone = new ClientPhone();
-        clientPhone.type = phone.type;
-        clientPhone.number = phone.number;
-        clientPhone.isPrimary = phone.isPrimary ?? false;
-        return clientPhone;
-      });
+      await this.replacePhones(id, dto.phones);
     }
 
-    return this.clientsRepository.save(client);
+    return this.findOneByOwner(id, ownerId);
+  }
+
+  private async replacePhones(
+    clientId: string,
+    phones: ClientPhoneRequestDto[],
+  ): Promise<void> {
+    await this.clientPhonesRepository.delete({ clientId });
+
+    const newPhones = phones.map((phone) =>
+      this.clientPhonesRepository.create({
+        clientId,
+        type: phone.type,
+        number: phone.number,
+        isPrimary: phone.isPrimary ?? false,
+      }),
+    );
+
+    await this.clientPhonesRepository.save(newPhones);
   }
 
   async remove(id: string, ownerId: string): Promise<void> {
